@@ -1,5 +1,19 @@
 # Islamic Audio Lectures Platform - Claude Instructions
 
+## Architecture Constraints
+
+- Primary Orchestrator: Claude Fable 5 (Active Session Model)
+
+## Multi-Agent Execution Routing
+
+When managing complex multi-stage engineering workflows, split tasks across subagents using this resource model:
+
+- Read-Only Codebase Navigation & File Map: Route to **Haiku** subagent.
+- Code Editing, Refactoring, & Test Writing: Route to **Sonnet** subagent.
+- Compilation & Independent Code Verification Check: Route to **Sonnet** subagent.
+
+---
+
 <project_overview>
 A web platform for hosting and streaming ~160 Arabic Islamic lecture audio files. Users can browse, stream, and download lectures. Admin can upload and manage content via Google OAuth-protected panel.
 
