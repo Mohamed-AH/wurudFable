@@ -1,0 +1,393 @@
+<div class="lecture-card">
+  <div class="lecture-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+  </div>
+
+  <div class="lecture-content">
+    <h3 class="lecture-title">
+      <a href="/lectures/<%= lecture.shortId ? lecture.shortId + '/' + (lecture.slug_en || '') + '/' + encodeURIComponent(lecture.slug_ar || '') : (lecture.slug ? encodeURIComponent(lecture.slug) : lecture._id) %>"><%= locale === 'ar' ? lecture.titleArabic : (lecture.titleEnglish || lecture.titleArabic) %></a>
+    </h3>
+
+    <div class="lecture-meta">
+      <span class="lecture-sheikh">
+        <% if (lecture.sheikhId) { %>
+          <%= locale === 'ar' ? lecture.sheikhId.nameArabic : (lecture.sheikhId.nameEnglish || lecture.sheikhId.nameArabic) %>
+          <% if (lecture.sheikhId.honorific && locale === 'ar') { %>
+            <%= lecture.sheikhId.honorific %>
+          <% } %>
+        <% } %>
+      </span>
+
+      <% if (lecture.seriesId) { %>
+        <span class="lecture-divider">•</span>
+        <span class="lecture-series"><%= locale === 'ar' ? lecture.seriesId.titleArabic : (lecture.seriesId.titleEnglish || lecture.seriesId.titleArabic) %></span>
+      <% } %>
+    </div>
+
+    <div class="lecture-info">
+      <% if (lecture.duration && lecture.duration > 0) { %>
+        <span class="lecture-duration">⏱️ <%= lecture.durationFormatted %></span>
+        <span class="lecture-divider">•</span>
+      <% } %>
+      <span class="lecture-plays">▶️ <%= lecture.playCount %> <%= locale === 'ar' ? 'مرة' : 'plays' %></span>
+      <% if (lecture.dateRecordedHijri) { %>
+        <span class="lecture-divider">•</span>
+        <span class="lecture-date" title="<%= locale === 'ar' ? 'تاريخ التسجيل (هجري)' : 'Recording Date (Hijri)' %>">
+          📅 <%= formatHijriDate(lecture.dateRecordedHijri) %>
+        </span>
+      <% } %>
+      <% if (lecture.category && lecture.category !== 'Other') { %>
+        <span class="lecture-divider">•</span>
+        <span class="lecture-category"><%= translateCategory(lecture.category) %></span>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="lecture-actions">
+    <% if (lecture.audioFileName) { %>
+      <% const displayTitle = locale === 'ar' ? (lecture.titleArabic || '') : (lecture.titleEnglish || lecture.titleArabic || ''); %>
+      <% const displaySheikh = lecture.sheikhId ? (locale === 'ar' ? lecture.sheikhId.nameArabic : (lecture.sheikhId.nameEnglish || lecture.sheikhId.nameArabic)) : ''; %>
+      <button class="btn-play" onclick="playAudio('<%= lecture._id %>', '<%= displayTitle.replace(/'/g, "\\'") %>', '<%= displaySheikh.replace(/'/g, "\\'") %>')" title="<%= typeof t === 'function' ? t('lecture_play') : (locale === 'ar' ? 'استماع' : 'Play') %>">
+        ▶️
+      </button>
+    <% } else { %>
+      <button class="btn-play" disabled style="opacity: 0.5; cursor: not-allowed;" title="<%= locale === 'ar' ? 'لا يوجد ملف صوتي' : 'No audio file' %>">
+        ▶️
+      </button>
+    <% } %>
+    <a href="/download/<%= lecture._id %>" class="btn-download" title="<%= typeof t === 'function' ? t('lecture_download') : (locale === 'ar' ? 'تحميل' : 'Download') %>">⬇️</a>
+    <% const shareTitle = locale === 'ar' ? (lecture.titleArabic || '') : (lecture.titleEnglish || lecture.titleArabic || ''); %>
+    <button class="btn-share-card" onclick="if(window.shareModule){window.shareModule.share(window.location.origin + '/lectures/<%= lecture.shortId ? lecture.shortId + '/' + (lecture.slug_en || '') + '/' + encodeURIComponent(lecture.slug_ar || '') : (lecture.slug ? encodeURIComponent(lecture.slug) : lecture._id) %>', '<%= shareTitle.replace(/'/g, "\\'").replace(/\n/g, " ") %>')}" title="<%= typeof t === 'function' ? t('lecture_share') : (locale === 'ar' ? 'مشاركة' : 'Share') %>">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .lecture-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .lecture-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .lecture-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-amber) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--primary-dark);
+  }
+
+  .lecture-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .lecture-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .lecture-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .lecture-title a:hover {
+    color: var(--accent-gold);
+  }
+
+  .lecture-meta {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .lecture-sheikh {
+    font-weight: 500;
+    color: var(--accent-gold);
+  }
+
+  .lecture-info {
+    color: var(--text-secondary);
+    font-size: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .lecture-divider {
+    opacity: 0.5;
+  }
+
+  .lecture-category {
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .lecture-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-play,
+  .btn-download {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s;
+    border: 2px solid var(--accent-gold);
+    cursor: pointer;
+  }
+
+  .btn-play {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+  }
+
+  .btn-play:hover {
+    background: var(--accent-amber);
+    transform: scale(1.05);
+  }
+
+  .btn-download {
+    background: transparent;
+    color: var(--accent-gold);
+  }
+
+  .btn-download:hover {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+  }
+
+  .btn-share-card {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+    border: 2px solid var(--accent-gold);
+    cursor: pointer;
+    background: transparent;
+    color: var(--accent-gold);
+  }
+
+  .btn-share-card:hover {
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+  }
+
+  /* Tablet and below */
+  @media (max-width: 768px) {
+    .lecture-card {
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .lecture-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    .lecture-title {
+      font-size: 16px;
+    }
+  }
+
+  /* Small screens - stack layout */
+  @media (max-width: 640px) {
+    .lecture-card {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      max-width: 100%;
+      padding: 14px;
+      gap: 10px;
+    }
+
+    .lecture-icon {
+      display: none;
+    }
+
+    .lecture-content {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .lecture-title {
+      font-size: 15px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .lecture-meta {
+      font-size: 13px;
+    }
+
+    .lecture-info {
+      font-size: 12px;
+    }
+
+    .lecture-actions {
+      width: 100%;
+      max-width: 100%;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn-play,
+    .btn-download,
+    .btn-share-card {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  /* Small phones (below 480px) */
+  @media (max-width: 480px) {
+    .lecture-card {
+      padding: 12px;
+      gap: 8px;
+      border-radius: 10px;
+    }
+
+    .lecture-title {
+      font-size: 14px;
+      margin-bottom: 4px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .lecture-meta {
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .lecture-info {
+      font-size: 11px;
+      gap: 4px;
+    }
+
+    .lecture-divider {
+      display: none;
+    }
+
+    .lecture-info > span {
+      display: inline-block;
+    }
+
+    .lecture-info > span:not(:last-child)::after {
+      content: ' • ';
+      opacity: 0.5;
+    }
+
+    .lecture-category {
+      font-size: 10px;
+      padding: 2px 6px;
+    }
+
+    .lecture-actions {
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-play,
+    .btn-download,
+    .btn-share-card {
+      width: 34px;
+      height: 34px;
+      font-size: 13px;
+      border-width: 1.5px;
+      border-radius: 6px;
+    }
+  }
+
+  /* Very small phones (below 360px) */
+  @media (max-width: 360px) {
+    .lecture-card {
+      padding: 10px;
+      gap: 6px;
+      border-radius: 8px;
+    }
+
+    .lecture-title {
+      font-size: 13px;
+    }
+
+    .lecture-meta {
+      font-size: 11px;
+    }
+
+    .lecture-info {
+      font-size: 10px;
+    }
+
+    .lecture-actions {
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-play,
+    .btn-download,
+    .btn-share-card {
+      width: 30px;
+      height: 30px;
+      font-size: 11px;
+      border-radius: 5px;
+    }
+  }
+</style>

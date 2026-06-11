@@ -1,0 +1,745 @@
+/**
+ * Sticky Audio Player Styles
+ * Brown/Gold Scholarly Design
+ */
+
+.audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #2C1810 0%, #3D2419 100%);
+  border-top: 3px solid #C19A6B;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  padding: 16px 24px;
+  transition: transform 0.3s ease;
+}
+
+.audio-player.hidden {
+  transform: translateY(100%);
+}
+
+.player-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+/* Left: Now Playing Info */
+.player-info {
+  min-width: 0; /* Allows text truncation */
+}
+
+.now-playing-label {
+  font-size: 11px;
+  color: #D4A574;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.lecture-title {
+  font-family: 'Scheherazade New', serif;
+  font-size: 18px;
+  color: #FAF7F2;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheikh-name {
+  font-size: 14px;
+  color: #C19A6B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Center: Playback Controls */
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #C19A6B;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-separator {
+  color: #8B7355;
+  margin: 0 4px;
+}
+
+/* Progress Bar */
+.progress-container {
+  width: 100%;
+  height: 24px;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  touch-action: none; /* Prevent scroll on touch */
+  display: flex;
+  align-items: center;
+}
+
+/* The visible track */
+.progress-container::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 8px;
+  background: rgba(193, 154, 107, 0.2);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Expand track on hover */
+.progress-container:hover::before {
+  height: 10px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: linear-gradient(90deg, #C19A6B 0%, #D4A574 100%);
+  border-radius: 4px;
+  width: 0%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Expand filled bar on hover to match track */
+.progress-container:hover .progress-bar {
+  height: 10px;
+}
+
+/* Disable transition during drag for immediate feedback */
+.progress-container:not(.dragging) .progress-bar {
+  transition: width 0.1s linear, height 0.15s ease;
+}
+
+.progress-container.dragging .progress-bar {
+  transition: height 0.15s ease;
+}
+
+.progress-handle {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: #FAF7F2;
+  border: 2px solid #C19A6B;
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover state - slight grow */
+.progress-container:hover .progress-handle {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Active/dragging state */
+.progress-handle:active,
+.progress-container.dragging .progress-handle {
+  cursor: grabbing;
+  transform: translateY(-50%) scale(1.2);
+  background: #C19A6B;
+  border-color: #FAF7F2;
+  box-shadow: 0 4px 16px rgba(193, 154, 107, 0.5);
+}
+
+/* Prevent text selection while dragging */
+body.audio-seeking {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grabbing !important;
+}
+
+body.audio-seeking * {
+  cursor: grabbing !important;
+}
+
+/* Control Buttons */
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-btn {
+  background: transparent;
+  border: 2px solid #C19A6B;
+  color: #C19A6B;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.control-btn:hover {
+  background: #C19A6B;
+  color: #2C1810;
+  transform: scale(1.05);
+}
+
+.control-btn-primary {
+  background: #C19A6B;
+  color: #2C1810;
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(193, 154, 107, 0.4);
+}
+
+.control-btn-primary:hover {
+  background: #D4A574;
+  transform: scale(1.1);
+}
+
+.control-btn-small {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.control-icon {
+  line-height: 0;
+}
+
+/* Skip buttons with 15s indicator */
+.skip-btn {
+  width: 44px;
+  height: 44px;
+  position: relative;
+}
+
+.skip-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.skip-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.skip-seconds {
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: -2px;
+}
+
+/* Download button - polished design */
+.download-btn {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(193, 154, 107, 0.15);
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  box-sizing: border-box;
+}
+
+.download-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  margin: auto;
+}
+
+.download-btn:hover {
+  background: #C19A6B;
+}
+
+.download-btn:hover svg {
+  stroke: #2C1810;
+}
+
+/* Right: Additional Controls */
+.player-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Speed Control */
+.speed-control {
+  position: relative;
+}
+
+#speedLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.speed-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  background: #2C1810;
+  border: 2px solid #C19A6B;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  min-width: 80px;
+}
+
+.speed-menu.hidden {
+  display: none;
+}
+
+.speed-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #C19A6B;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.speed-option:hover {
+  background: rgba(193, 154, 107, 0.2);
+}
+
+.speed-option.active {
+  background: #C19A6B;
+  color: #2C1810;
+}
+
+/* Volume Control */
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volume-slider {
+  width: 80px;
+  height: 4px;
+  background: rgba(193, 154, 107, 0.2);
+  border-radius: 2px;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #C19A6B;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  background: #D4A574;
+  transform: scale(1.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #C19A6B;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  background: #D4A574;
+  transform: scale(1.1);
+}
+
+/* Download/Close Buttons */
+#downloadBtn {
+  text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .player-container {
+    grid-template-columns: 1fr 1.5fr;
+    gap: 16px;
+  }
+
+  .player-actions {
+    grid-column: 1 / -1;
+    justify-content: center;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .audio-player {
+    padding: 12px 16px;
+  }
+
+  .player-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .player-info {
+    text-align: center;
+  }
+
+  .lecture-title {
+    font-size: 16px;
+  }
+
+  .sheikh-name {
+    font-size: 13px;
+  }
+
+  .control-buttons {
+    gap: 8px;
+  }
+
+  .control-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .control-btn-primary {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  /* Skip buttons on mobile */
+  .skip-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .skip-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .skip-seconds {
+    font-size: 8px;
+  }
+
+  .volume-control {
+    display: none; /* Hide volume on mobile (use device volume) */
+  }
+
+  .player-actions {
+    gap: 12px;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  /* Fix speed menu position on mobile to prevent overflow */
+  .speed-control {
+    position: static;
+  }
+
+  .speed-menu {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+    margin-bottom: 0;
+    z-index: 10000;
+  }
+}
+
+/* RTL Support */
+html[dir="rtl"] .player-container {
+  direction: rtl;
+}
+
+html[dir="rtl"] .player-info,
+html[dir="rtl"] .lecture-title,
+html[dir="rtl"] .sheikh-name {
+  text-align: right;
+}
+
+html[dir="rtl"] .player-actions {
+  justify-content: flex-start;
+}
+
+/* RTL: Progress bar grows from right to left */
+html[dir="rtl"] .progress-bar {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+html[dir="rtl"] .progress-handle {
+  right: auto;
+  left: -6px;
+}
+
+html[dir="rtl"] .speed-menu {
+  right: auto;
+  left: 0;
+}
+
+/* RTL Mobile - use same centered positioning */
+@media (max-width: 768px) {
+  html[dir="rtl"] .speed-menu {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Small phones (below 480px) */
+@media (max-width: 480px) {
+  .audio-player {
+    padding: 10px 12px;
+  }
+
+  .player-container {
+    gap: 10px;
+  }
+
+  .now-playing-label {
+    font-size: 10px;
+  }
+
+  .lecture-title {
+    font-size: 14px;
+  }
+
+  .sheikh-name {
+    font-size: 12px;
+  }
+
+  .time-display {
+    font-size: 12px;
+  }
+
+  .control-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .control-btn-primary {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .skip-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .skip-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .skip-seconds {
+    font-size: 7px;
+  }
+
+  .control-btn-small {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .player-actions {
+    gap: 8px;
+  }
+
+  #speedLabel {
+    font-size: 11px;
+  }
+
+  .progress-container {
+    height: 20px;
+  }
+
+  .progress-container::before,
+  .progress-bar {
+    height: 6px;
+  }
+
+  .progress-container:hover::before,
+  .progress-container:hover .progress-bar {
+    height: 8px;
+  }
+
+  .progress-handle {
+    width: 14px;
+    height: 14px;
+  }
+
+  .progress-container:hover .progress-handle {
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .progress-container.dragging .progress-handle {
+    transform: translateY(-50%) scale(1.2);
+  }
+}
+
+/* Very small phones (below 360px) */
+@media (max-width: 360px) {
+  .audio-player {
+    padding: 8px 10px;
+  }
+
+  .player-container {
+    gap: 8px;
+  }
+
+  .now-playing-label {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+
+  .lecture-title {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .sheikh-name {
+    font-size: 11px;
+  }
+
+  .time-display {
+    font-size: 11px;
+  }
+
+  /* Smaller control buttons */
+  .control-buttons {
+    gap: 6px;
+  }
+
+  .control-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+    border-width: 1.5px;
+  }
+
+  .control-btn-primary {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .skip-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .skip-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .skip-seconds {
+    font-size: 6px;
+    margin-top: -1px;
+  }
+
+  .control-btn-small {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .player-actions {
+    gap: 6px;
+  }
+
+  #speedLabel {
+    font-size: 10px;
+  }
+
+  .download-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .progress-container {
+    height: 18px;
+  }
+
+  .progress-container::before,
+  .progress-bar {
+    height: 5px;
+  }
+
+  .progress-container:hover::before,
+  .progress-container:hover .progress-bar {
+    height: 7px;
+  }
+
+  .progress-handle {
+    width: 12px;
+    height: 12px;
+  }
+
+  .progress-container:hover .progress-handle {
+    transform: translateY(-50%) scale(1.15);
+  }
+
+  .progress-container.dragging .progress-handle {
+    transform: translateY(-50%) scale(1.25);
+  }
+
+  /* Speed menu adjustments */
+  .speed-menu {
+    bottom: 100px;
+    min-width: 70px;
+  }
+
+  .speed-option {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

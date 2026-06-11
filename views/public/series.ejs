@@ -1,0 +1,290 @@
+<style>
+  .page-header {
+    background: linear-gradient(135deg, var(--primary-brown) 0%, var(--sage) 100%);
+    padding: 48px 0;
+    margin-bottom: 40px;
+    border-bottom: 3px solid var(--accent-gold);
+  }
+
+  .page-title {
+    font-size: 36px;
+    font-family: var(--font-arabic-display);
+    color: var(--cream);
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .page-subtitle {
+    color: var(--cream);
+    font-size: 16px;
+    opacity: 0.9;
+  }
+
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+
+  .series-card {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 24px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 2px solid var(--accent-amber);
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 4px 12px var(--shadow-warm);
+  }
+
+  .series-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px var(--shadow-warm);
+    border-color: var(--accent-gold);
+  }
+
+  .series-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .series-icon svg {
+    color: var(--primary-dark);
+  }
+
+  .series-content {
+    flex: 1;
+  }
+
+  .series-title {
+    font-family: var(--font-arabic-display);
+    font-size: 22px;
+    color: var(--primary-dark);
+    margin-bottom: 4px;
+  }
+
+  .series-title-en {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .series-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    align-items: center;
+  }
+
+  .series-sheikh {
+    color: var(--accent-gold);
+    font-weight: 600;
+  }
+
+  .series-category {
+    background: var(--accent-amber);
+    color: var(--primary-dark);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-secondary);
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .page-header {
+      padding: 32px 0;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 28px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+    }
+
+    .series-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .series-card {
+      padding: 16px;
+    }
+
+    .series-title {
+      font-size: 20px;
+    }
+
+    .series-icon {
+      width: 48px;
+      height: 48px;
+    }
+
+    .series-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  /* Small phones (below 480px) */
+  @media (max-width: 480px) {
+    .page-header {
+      padding: 24px 0;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      font-size: 24px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+    }
+
+    .series-grid {
+      gap: 12px;
+    }
+
+    .series-card {
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .series-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    .series-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .series-title {
+      font-size: 18px;
+    }
+
+    .series-title-en {
+      font-size: 13px;
+    }
+
+    .series-meta {
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .series-category {
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+  }
+
+  /* Very small phones (below 360px) */
+  @media (max-width: 360px) {
+    .page-title {
+      font-size: 20px;
+    }
+
+    .series-card {
+      padding: 12px;
+      gap: 10px;
+    }
+
+    .series-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .series-title {
+      font-size: 16px;
+    }
+
+    .series-title-en {
+      font-size: 12px;
+    }
+
+    .series-meta {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">السلاسل</h1>
+    <p class="page-subtitle">تصفح جميع السلاسل العلمية</p>
+  </div>
+</div>
+
+<div class="container">
+  <% if (series && series.length > 0) { %>
+    <div class="series-grid">
+      <% series.forEach(s => { %>
+        <a href="/series/<%= s.slug ? encodeURIComponent(s.slug) : s._id %>" class="series-card">
+          <div class="series-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
+          <div class="series-content">
+            <h3 class="series-title"><%= s.titleArabic %></h3>
+            <% if (s.titleEnglish) { %>
+              <p class="series-title-en"><%= s.titleEnglish %></p>
+            <% } %>
+            <div class="series-meta">
+              <% if (s.sheikhId) { %>
+                <span class="series-sheikh"><%= s.sheikhId.nameArabic %></span>
+                <span>•</span>
+              <% } %>
+              <% if (s.category) { %>
+                <%
+                  const categoryArabic = {
+                    'Tafsir': 'تفسير',
+                    'Hadith': 'حديث',
+                    'Fiqh': 'فقه',
+                    'Aqeedah': 'عقيدة',
+                    'Seerah': 'سيرة',
+                    'Akhlaq': 'أخلاق',
+                    'Other': 'أخرى'
+                  };
+                %>
+                <span class="series-category"><%= categoryArabic[s.category] || s.category || 'أخرى' %></span>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <div class="empty-icon">📚</div>
+      <h3>لا توجد سلاسل حالياً</h3>
+    </div>
+  <% } %>
+</div>
